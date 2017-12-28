@@ -1,0 +1,16 @@
+stages:
+    - deploy
+
+docker:snapshot-container:
+    image: docker:stable
+    before_script:
+        - docker info
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.ispirata.com
+    services:
+        - docker:stable-dind
+    stage: deploy
+    only:
+        - master@Astarte-NG/vernemq-astarte-docker
+    script:
+        - docker build -t registry.ispirata.com/astarte-ng/vernemq-astarte-docker:snapshot .
+        - docker push registry.ispirata.com/astarte-ng/vernemq-astarte-docker:snapshot

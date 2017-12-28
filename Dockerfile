@@ -41,8 +41,8 @@ FROM debian:jessie-slim
 # Set the locale
 ENV LANG C.UTF-8
 
-# We need SSL
-RUN apt-get -qq update && apt-get -qq install libssl1.0.0 && apt-get clean
+# We need SSL, curl and jq - and to ensure /etc/ssl/astarte
+RUN apt-get -qq update && apt-get -qq install libssl1.0.0 curl jq && apt-get clean && mkdir -p /etc/ssl/astarte
 
 WORKDIR /opt
 # Copy our built stuff (both are self-contained with their ERTS release)
@@ -50,7 +50,10 @@ COPY --from=builder /build/vernemq/_build/default/rel/vernemq .
 COPY --from=builder /build/astarte_vmq_plugin/_build/prod/rel/astarte_vmq_plugin .
 
 # MQTT
-EXPOSE 1883 
+EXPOSE 1883
+
+# MQTT for Reverse Proxy
+EXPOSE 1885
 
 # MQTT/SSL
 EXPOSE 8883
@@ -60,8 +63,8 @@ EXPOSE 44053
 
 # EPMD - Erlang Port Mapper Daemon
 EXPOSE 4369
-    
-# Specific Distributed Erlang Port Range 
+
+# Specific Distributed Erlang Port Range
 EXPOSE 9100 9101 9102 9103 9104 9105 9106 9107 9108 9109
 
 # Prometheus Metrics

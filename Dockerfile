@@ -1,7 +1,7 @@
 # Build with Elixir 1.5/OTP 20
 FROM elixir:1.5-slim as builder
 
-RUN apt-get -qq update && apt-get -qq install git build-essential
+RUN apt-get -qq update && apt-get -qq install git build-essential libssl-dev
 
 RUN mix local.hex --force && \
     mix local.rebar --force && \
@@ -44,7 +44,7 @@ ENV LANG C.UTF-8
 RUN apt-get -qq update && apt-get -qq install libssl1.0.0 && apt-get clean
 
 WORKDIR /opt
-# Copy our built stuff (both are self contained with an ERTS release)
+# Copy our built stuff (both are self-contained with their ERTS release)
 COPY --from=builder /build/vernemq/_build/default/rel/vernemq .
 COPY --from=builder /build/astarte_vmq_plugin/_build/prod/rel/astarte_vmq_plugin .
 

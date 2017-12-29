@@ -69,7 +69,7 @@ EXPOSE 9100 9101 9102 9103 9104 9105 9106 9107 9108 9109
 # Prometheus Metrics
 EXPOSE 8888
 
-# Expose ports for ACME verification
-EXPOSE 443 80
+# Expose port for webroot ACME verification
+EXPOSE 80
 
 CMD ["/opt/vernemq/bin/vernemq.sh"]

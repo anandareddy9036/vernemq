@@ -69,15 +69,18 @@ if env | grep -q "VERNEMQ_ENABLE_SSL_LISTENER"; then
         # Ensure certbot, first of all
         echo 'deb http://ftp.debian.org/debian jessie-backports main' | tee /etc/apt/sources.list.d/backports.list
         apt-get update
+        apt-get -qq install nginx-light
+        /etc/init.d/nginx start
         if ! apt-get -qq install certbot -t jessie-backports; then
             echo "Could not install certbot, exiting"
             exit $?
         fi
         # Obtain certificate
-        if ! certbot certonly -n --standalone --agree-tos --email $LETSENCRYPT_EMAIL --domains $LETSENCRYPT_DOMAINS; then
+        if ! certbot certonly -n --webroot --webroot-path=/var/www/html --agree-tos --email $LETSENCRYPT_EMAIL --domains $LETSENCRYPT_DOMAINS; then
             echo "Certbot failed, exiting"
             exit $?
         fi
+        /etc/init.d/nginx stop &
         letsencrypt_dir=/etc/letsencrypt/live/${LETSENCRYPT_DOMAINS%,*}
         # Then we copy our private key and certificate.
         cp $letsencrypt_dir/privkey.pem /opt/vernemq/etc/privkey.pem || exit 1

@@ -59,8 +59,7 @@ fi
 
 if env | grep -q "VERNEMQ_ENABLE_SSL_LISTENER"; then
     # Let's do our magic. First of all, let's ask for certificates.
-    curl -s -d '{"label": "primary"}' -X POST $CFSSL_URL/api/v1/cfssl/info | jq -e -r ".result.certificate" > /etc/ssl/cfssl-ca-cert.crt
-    if [ $? -ne 1 ]; then
+    if ! curl -s -d '{"label": "primary"}' -X POST $CFSSL_URL/api/v1/cfssl/info | jq -e -r ".result.certificate" > /etc/ssl/cfssl-ca-cert.crt; then
         echo "Could not retrieve certificate from CFSSL at $CFSSL_URL , exiting"
         exit $?
     fi
@@ -69,14 +68,13 @@ if env | grep -q "VERNEMQ_ENABLE_SSL_LISTENER"; then
         echo "You have chosen Let's encrypt as the deploy mechanism - this means clustering Verne is impossible!"
         # Ensure certbot, first of all
         echo 'deb http://ftp.debian.org/debian jessie-backports main' | tee /etc/apt/sources.list.d/backports.list
-        apt-get update && apt-get -qq install certbot -t jessie-backports
-        if [ $? -ne 1 ]; then
+        apt-get update
+        if ! apt-get -qq install certbot -t jessie-backports; then
             echo "Could not install certbot, exiting"
             exit $?
         fi
         # Obtain certificate
-        certbot certonly -n --standalone --agree-tos --email $LETSENCRYPT_EMAIL --domains $LETSENCRYPT_DOMAINS
-        if [ $? -ne 1 ]; then
+        if ! certbot certonly -n --standalone --agree-tos --email $LETSENCRYPT_EMAIL --domains $LETSENCRYPT_DOMAINS; then
             echo "Certbot failed, exiting"
             exit $?
         fi

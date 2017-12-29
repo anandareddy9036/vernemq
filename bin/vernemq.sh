@@ -76,7 +76,11 @@ if env | grep -q "VERNEMQ_ENABLE_SSL_LISTENER"; then
             exit $?
         fi
         # Obtain certificate
-        if ! certbot certonly -n --webroot --webroot-path=/var/www/html --agree-tos --email $LETSENCRYPT_EMAIL --domains $LETSENCRYPT_DOMAINS; then
+        if env | grep -q "LETSENCRYPT_STAGING"; then
+            echo "Using staging Let's Encrypt - certificate won't be valid!"
+            certbot_staging=--test-cert
+        fi
+        if ! certbot certonly -n $certbot_staging --webroot --webroot-path=/var/www/html --agree-tos --email $LETSENCRYPT_EMAIL --domains $LETSENCRYPT_DOMAINS; then
             echo "Certbot failed, exiting"
             exit $?
         fi

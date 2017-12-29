@@ -44,10 +44,9 @@ ENV LANG C.UTF-8
 # We need SSL, curl and jq - and to ensure /etc/ssl/astarte
 RUN apt-get -qq update && apt-get -qq install libssl1.0.0 curl jq && apt-get clean && mkdir -p /etc/ssl/astarte
 
-WORKDIR /opt
 # Copy our built stuff (both are self-contained with their ERTS release)
-COPY --from=builder /build/vernemq/_build/default/rel/vernemq .
-COPY --from=builder /build/astarte_vmq_plugin/_build/prod/rel/astarte_vmq_plugin .
+COPY --from=builder /build/vernemq/_build/default/rel/vernemq /opt/vernemq/
+COPY --from=builder /build/astarte_vmq_plugin/_build/prod/rel/astarte_vmq_plugin /opt/astarte_vmq_plugin/
 
 # MQTT
 EXPOSE 1883

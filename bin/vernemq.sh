@@ -123,7 +123,11 @@ sigterm_handler() {
 trap 'kill ${!}; siguser1_handler' SIGUSR1
 trap 'kill ${!}; sigterm_handler' SIGTERM
 
-/opt/vernemq/bin/vernemq start
+if ! /opt/vernemq/bin/vernemq start; then
+    echo "Could not start VerneMQ!"
+    cat /opt/vernemq/log/console.log
+    exit $?
+fi
 pid=$(ps aux | grep '[b]eam.smp' | awk '{print $2}')
 
 while true

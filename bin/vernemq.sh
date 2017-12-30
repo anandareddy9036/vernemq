@@ -17,7 +17,7 @@ sed -i '/########## Start ##########/,/########## End ##########/d' /opt/vernemq
 
 echo "########## Start ##########" >> /opt/vernemq/etc/vernemq.conf
 
-env | grep DOCKER_VERNEMQ | grep -v 'DISCOVERY_NODE\|DOCKER_VERNEMQ_USER' | cut -c 16- | tr '[:upper:]' '[:lower:]' | sed 's/__/./g' >> /opt/vernemq/etc/vernemq.conf
+env | grep DOCKER_VERNEMQ | grep -v 'DISCOVERY_NODE\|DOCKER_VERNEMQ_USER' | cut -c 16- | sed "s/^[^=]*=/\L&/g" | sed 's/__/./g' >> /opt/vernemq/etc/vernemq.conf
 
 users_are_set=$(env | grep DOCKER_VERNEMQ_USER)
 if [ ! -z "$users_are_set" ]

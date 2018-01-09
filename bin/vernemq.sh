@@ -13,6 +13,26 @@ if env | grep -q "DOCKER_VERNEMQ_DISCOVERY_NODE"; then
     echo "-eval \"vmq_server_cmd:node_join('VerneMQ@${DOCKER_VERNEMQ_DISCOVERY_NODE}')\"" >> /opt/vernemq/etc/vm.args
 fi
 
+if env | grep -q "DISCOVERY_KUBERNETES"; then
+    # Let's retrieve our IP
+    kube_ips=$(curl -X GET --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces/default/pods?labelSelector=app=vernemq -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" | jq '.items[].status.podIP' | sed 's/"//g' | tr '\n' ' ')
+    for kube_ip in $kube_ips;
+    do
+        if [ $kube_ip == "null" ]
+            then
+                echo "Kubernetes discovery selected, but no pods found. Maybe we're the first?"
+                echo "Anyway, we won't attempt to join any cluster."
+                break
+        fi
+        if [ $kube_ip != $MY_POD_IP ]
+            then
+                echo "Will join an existing Kubernetes cluster with discovery node at $kube_ip"
+                echo "-eval \"vmq_server_cmd:node_join('VerneMQ@${kube_ip}')\"" >> /opt/vernemq/etc/vm.args
+                break
+        fi
+    done
+fi
+
 sed -i '/########## Start ##########/,/########## End ##########/d' /opt/vernemq/etc/vernemq.conf
 
 echo "########## Start ##########" >> /opt/vernemq/etc/vernemq.conf

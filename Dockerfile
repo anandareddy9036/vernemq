@@ -10,10 +10,10 @@ RUN mix local.hex --force && \
 WORKDIR /build
 ENV MIX_ENV prod
 
-# Let's start by building VerneMQ 1.2.2
+# Let's start by building VerneMQ 1.2.3
 RUN git clone https://github.com/erlio/vernemq.git && \
 		cd vernemq && \
-		git checkout 1.2.2 && \
+		git checkout 1.2.3 && \
 		make rel && \
 		cd ..
 

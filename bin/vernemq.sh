@@ -15,7 +15,7 @@ fi
 
 if env | grep -q "DISCOVERY_KUBERNETES"; then
     # Let's retrieve our IP
-    kube_ips=$(curl -X GET --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces/default/pods?labelSelector=app=vernemq -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" | jq '.items[].status.podIP' | sed 's/"//g' | tr '\n' ' ')
+    kube_ips=$(curl -X GET --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces/$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)/pods?labelSelector=app=vernemq -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" | jq '.items[].status.podIP' | sed 's/"//g' | tr '\n' ' ')
     for kube_ip in $kube_ips;
     do
         if [ $kube_ip == "null" ]

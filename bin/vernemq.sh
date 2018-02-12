@@ -16,8 +16,10 @@ fi
 if env | grep -q "DISCOVERY_KUBERNETES"; then
     # Let's set our nodename correctly
     VERNEMQ_KUBERNETES_SUBDOMAIN=$(curl -X GET --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces/$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)/pods?labelSelector=app=vernemq -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" | jq '.items[0].spec.subdomain' | sed 's/"//g' | tr '\n' '\0')
-    VERNEMQ_KUBERNETES_HOSTNAME=$MY_POD_NAME.$VERNEMQ_KUBERNETES_SUBDOMAIN
+    VERNEMQ_KUBERNETES_HOSTNAME=$MY_POD_NAME.$VERNEMQ_KUBERNETES_SUBDOMAIN.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local
+    export DOCKER_VERNEMQ_NODENAME=$MY_POD_NAME.$VERNEMQ_KUBERNETES_SUBDOMAIN
     sed -i.bak -r "s/VerneMQ@.+/VerneMQ@${VERNEMQ_KUBERNETES_HOSTNAME}/" /opt/vernemq/etc/vm.args
+    # Hack into K8S DNS resolution (temporarily)
     kube_pod_names=$(curl -X GET --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt https://kubernetes.default.svc.cluster.local/api/v1/namespaces/$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)/pods?labelSelector=app=vernemq -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" | jq '.items[].spec.hostname' | sed 's/"//g' | tr '\n' ' ')
     for kube_pod_name in $kube_pod_names;
     do
@@ -30,7 +32,7 @@ if env | grep -q "DISCOVERY_KUBERNETES"; then
         if [ $kube_pod_name != $MY_POD_NAME ]
             then
                 echo "Will join an existing Kubernetes cluster with discovery node at $kube_pod_name.$VERNEMQ_KUBERNETES_SUBDOMAIN"
-                echo "-eval \"vmq_server_cmd:node_join('VerneMQ@${kube_pod_name}.${VERNEMQ_KUBERNETES_SUBDOMAIN}')\"" >> /opt/vernemq/etc/vm.args
+                echo "-eval \"vmq_server_cmd:node_join('VerneMQ@${kube_pod_name}.${VERNEMQ_KUBERNETES_SUBDOMAIN}.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local')\"" >> /opt/vernemq/etc/vm.args
                 break
         fi
     done

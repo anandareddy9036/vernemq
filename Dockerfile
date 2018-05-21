@@ -20,6 +20,7 @@ RUN git clone https://github.com/erlio/vernemq.git && \
 # Time for VerneMQ's Astarte plugin
 RUN git clone https://git.ispirata.com/Astarte-NG/astarte_vmq_plugin.git && \
 		cd astarte_vmq_plugin && \
+        git checkout exor && \
 		mix deps.get && \
 		mix release --env=$MIX_ENV && \
 		cd ..

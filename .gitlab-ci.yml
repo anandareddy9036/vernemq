@@ -10,7 +10,7 @@ docker:snapshot-container:
         - docker:stable-dind
     stage: deploy
     only:
-        - master@Astarte-NG/vernemq-astarte-docker
+        - master@Astarte-NG/vernemq
     script:
-        - docker build -t registry.ispirata.com/astarte-ng/vernemq-astarte-docker:snapshot .
-        - docker push registry.ispirata.com/astarte-ng/vernemq-astarte-docker:snapshot
+        - docker build -t registry.ispirata.com/astarte-ng/vernemq:snapshot .
+        - docker push registry.ispirata.com/astarte-ng/vernemq:snapshot

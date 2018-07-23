@@ -1,6 +1,10 @@
 stages:
     - deploy
 
+variables:
+    CONTAINER_SNAPSHOT_IMAGE: $DOCKER_REGISTRY/astarte-ng/vernemq:snapshot
+    CONTAINER_RELEASE_IMAGE: $DOCKER_REGISTRY/astarte-ng/vernemq:$CI_COMMIT_TAG
+
 docker:snapshot-container:
     image: docker:stable
     before_script:
@@ -12,5 +16,19 @@ docker:snapshot-container:
     only:
         - master@Astarte-NG/vernemq
     script:
-        - docker build -t registry.ispirata.com/astarte-ng/vernemq:snapshot .
-        - docker push registry.ispirata.com/astarte-ng/vernemq:snapshot
+        - docker build -t CONTAINER_SNAPSHOT_IMAGE .
+        - docker push CONTAINER_SNAPSHOT_IMAGE
+
+docker:release-container:
+    image: docker:stable
+    before_script:
+        - docker info
+        - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.ispirata.com
+    services:
+        - docker:stable-dind
+    stage: deploy
+    only:
+        - tags@Astarte-NG/vernemq
+    script:
+        - docker build -t CONTAINER_RELEASE_IMAGE .
+        - docker push CONTAINER_RELEASE_IMAGE

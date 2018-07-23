@@ -16,8 +16,8 @@ docker:snapshot-container:
     only:
         - master@Astarte-NG/vernemq
     script:
-        - docker build -t CONTAINER_SNAPSHOT_IMAGE .
-        - docker push CONTAINER_SNAPSHOT_IMAGE
+        - docker build -t $CONTAINER_SNAPSHOT_IMAGE .
+        - docker push $CONTAINER_SNAPSHOT_IMAGE
 
 docker:release-container:
     image: docker:stable
@@ -30,5 +30,5 @@ docker:release-container:
     only:
         - tags@Astarte-NG/vernemq
     script:
-        - docker build -t CONTAINER_RELEASE_IMAGE .
-        - docker push CONTAINER_RELEASE_IMAGE
+        - docker build -t $CONTAINER_RELEASE_IMAGE .
+        - docker push $CONTAINER_RELEASE_IMAGE

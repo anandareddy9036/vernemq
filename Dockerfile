@@ -13,7 +13,7 @@ ENV MIX_ENV prod
 # Let's start by building VerneMQ 1.4.1
 RUN git clone https://github.com/erlio/vernemq.git && \
 		cd vernemq && \
-		git checkout 1.4.1 && \
+		git checkout c0a49f1e1bb3e1b722fc6dcff7f42b0618ca6021 && \
 		make rel && \
 		cd ..
 

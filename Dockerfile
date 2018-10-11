@@ -13,13 +13,14 @@ ENV MIX_ENV prod
 # Let's start by building VerneMQ 1.2.3
 RUN git clone https://github.com/erlio/vernemq.git && \
 		cd vernemq && \
-		git checkout 1.2.3 && \
+                git checkout 1.2.3 && \
 		make rel && \
 		cd ..
 
 # Time for VerneMQ's Astarte plugin
 RUN git clone https://git.ispirata.com/Astarte-NG/astarte_vmq_plugin.git && \
 		cd astarte_vmq_plugin && \
+                git checkout testing && \
 		mix deps.get && \
 		mix release --env=$MIX_ENV && \
 		cd ..

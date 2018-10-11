@@ -14,7 +14,7 @@ docker:testing-container:
         - docker:stable-dind
     stage: deploy
     only:
-        - master@Astarte-NG/vernemq
+        - testing@Astarte-NG/vernemq
     script:
         - docker build -t $CONTAINER_TESTING_IMAGE .
         - docker push $CONTAINER_TESTING_IMAGE
